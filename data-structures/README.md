@@ -6,3 +6,4 @@ This is a personal repository of me trying to implement data structures and algo
 ## References
 * [The Rust Programming Language](https://doc.rust-lang.org/book/)
 * [Data Structures and Algorithms Made Easy: Data Structures and Algorithmic Puzzles 5th ed. Edition](https://www.amazon.com/Data-Structures-Algorithms-Made-Easy/dp/819324527X)
+* [Box Type Usage](https://dhghomon.github.io/easy_rust/Chapter_53.html)

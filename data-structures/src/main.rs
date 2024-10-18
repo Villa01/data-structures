@@ -1,11 +1,16 @@
 mod linked_list;
 
 fn main() {
-    let mut list_node = linked_list::ListNode::new(1);
-    let list_node2 = linked_list::ListNode::new(2);
-    let list_node3 = linked_list::ListNode::new(3);
-    list_node.next = Some(Box::new(list_node2)); // list_node2 is moved here
-    list_node.next.as_mut().unwrap().next = Some(Box::new(list_node3)); // Add list_node3
+    let node2 = linked_list::insert_at_beginning(None, 1);
+    let node1 = linked_list::insert_at_beginning(Some(node2), 2);
+    let mut head = linked_list::insert_at_beginning(Some(node1), 3);
 
-    linked_list::print(&list_node);
+    head = linked_list::insert_at_end(Some(head), 4);
+    head = linked_list::insert_at_end(Some(head), 5);
+
+    linked_list::print(&head);
+    println!(
+        "Linked list length {len}",
+        len = linked_list::length(&head)
+    );
 }
