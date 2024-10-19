@@ -1,3 +1,4 @@
+
 mod linked_list;
 
 fn main() {
@@ -7,6 +8,8 @@ fn main() {
 
     head = linked_list::insert_at_end(Some(head), 4);
     head = linked_list::insert_at_end(Some(head), 5);
+
+    linked_list::insert_at_position(&mut head, 10, 2);
 
     linked_list::print(&head);
     println!(
