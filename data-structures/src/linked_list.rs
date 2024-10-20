@@ -1,4 +1,3 @@
-
 pub struct ListNode {
     data: i32,
     pub next: Option<Box<ListNode>>,
@@ -80,13 +79,26 @@ pub fn insert_at_position(mut head: Option<Box<ListNode>>, data: i32, pos: usize
             new_node.next = node.next.take();
             node.next = Some(Box::new(new_node));
 
-            return head.expect("head node");
+            return head.expect("head node must exist to insert at position");
         }
 
         counter += 1;
         cur = &mut (*node).next;
-
     }
 
-    return head.expect("head node");
+    return head.expect("head node must exist to insert at position");
 }
+
+// Returns the new head
+pub fn delete_first(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+    match head {
+        Some(first_node) => {
+            
+            return first_node.next
+        },
+        None => None,
+    }
+}
+
+
+

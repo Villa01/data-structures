@@ -13,4 +13,8 @@ fn main() {
 
     linked_list::print(&head);
     println!("Linked list length {len}", len = linked_list::length(&head));
+
+    head = linked_list::delete_first(Some(head)).unwrap();
+    linked_list::print(&head);
+    println!("Linked list length {len}", len = linked_list::length(&head));
 }
