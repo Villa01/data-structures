@@ -1,4 +1,3 @@
-use std::ops::Deref;
 
 pub struct ListNode {
     data: i32,
@@ -67,20 +66,27 @@ pub fn insert_at_end(mut head: Option<Box<ListNode>>, data: i32) -> Box<ListNode
     }
 }
 
-pub fn insert_at_position(head: &mut Box<ListNode>, data: i32, pos: usize) {
-    let mut cur = Some(head);
+pub fn insert_at_position(mut head: Option<Box<ListNode>>, data: i32, pos: usize) -> Box<ListNode> {
+    if pos == 0 {
+        return insert_at_beginning(head, data);
+    }
+
+    let mut cur = &mut head;
     let mut counter = 0;
 
-    while let Some(node) = cur {
+    while let Some(ref mut node) = *cur {
         if counter == pos {
             let mut new_node = ListNode::new(data);
             new_node.next = node.next.take();
             node.next = Some(Box::new(new_node));
 
-            return;
+            return head.expect("head node");
         }
 
         counter += 1;
-        cur = node.next.as_mut();
+        cur = &mut (*node).next;
+
     }
+
+    return head.expect("head node");
 }
