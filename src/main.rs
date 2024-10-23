@@ -11,10 +11,11 @@ fn main() {
     head = linked_list::insert_at_position(Some(head), 4, 2);
     head = linked_list::insert_at_position(Some(head), 0, 0);
 
-    linked_list::print(&head);
-    println!("Linked list length {len}", len = linked_list::length(&head));
+    linked_list::print_summary(&head);
 
     head = linked_list::delete_first(Some(head)).unwrap();
-    linked_list::print(&head);
-    println!("Linked list length {len}", len = linked_list::length(&head));
+    linked_list::print_summary(&head);
+    
+    head = linked_list::delete_last(Some(head)).unwrap();
+    linked_list::print_summary(&head);
 }

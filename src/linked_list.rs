@@ -11,6 +11,10 @@ impl ListNode {
         }
     }
 
+    pub fn _to_string_debug(&self) -> String {
+        format!("[{:p} {}]", self, self.data)
+    }
+
     pub fn to_string(&self) -> String {
         format!("[{}]", self.data)
     }
@@ -24,6 +28,11 @@ pub fn print(head: &ListNode) {
         cur = node.next.as_deref();
     }
     println!("None");
+}
+
+pub fn print_summary(head: &ListNode) {
+    print(&head);
+    println!("Linked list length {len}", len = length(&head));
 }
 
 pub fn length(head: &ListNode) -> i32 {
@@ -92,13 +101,34 @@ pub fn insert_at_position(mut head: Option<Box<ListNode>>, data: i32, pos: usize
 // Returns the new head
 pub fn delete_first(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
     match head {
-        Some(first_node) => {
-            
-            return first_node.next
-        },
+        Some(first_node) => return first_node.next,
         None => None,
     }
 }
 
+pub fn delete_last(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+    match head {
+        Some(ref mut node) => {
+            let mut cur = node;
 
-
+            // Iterate until we find the second to last
+            while let Some(ref mut current) = (*cur).next {
+                let next = &current.next;
+                // 1 -> 2 -> 3 -> None
+                //      ^    ^
+                //   current |
+                //          next
+                if let Some(next) = next {
+                    if next.next.is_none() {
+                        (*current).next = None;
+                        return head;
+                    }
+                }
+                cur = current;
+            }
+            // next node does not exist, so we delete the head.
+            return None;
+        }
+        None => None,
+    }
+}
