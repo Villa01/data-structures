@@ -1,6 +1,6 @@
 
 pub struct ListNode {
-    data: i32,
+    pub data: i32,
     pub next: Option<Box<ListNode>>,
 }
 
