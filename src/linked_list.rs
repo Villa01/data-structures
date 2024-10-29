@@ -1,3 +1,4 @@
+
 pub struct ListNode {
     data: i32,
     pub next: Option<Box<ListNode>>,
@@ -128,6 +129,43 @@ pub fn delete_last(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
             }
             // next node does not exist, so we delete the head.
             return None;
+        }
+        None => None,
+    }
+}
+
+pub fn delete_at_position(
+    mut head: Option<Box<ListNode>>,
+    position: usize,
+) -> Option<Box<ListNode>> {
+    if position == 0 {
+        return delete_first(head);
+    }
+
+    match head {
+        Some(ref mut node) => {
+            let mut cur = node;
+            let mut counter = 1;
+
+            // Iterate until we find the position
+            while let Some(ref mut current) = (*cur).next {
+                // i = 2
+                // 1 -> 2 -> 3 -> 4 -> None
+                //      ^    ^  ^
+                //   current |  |
+                //       remove |
+                //             next
+                if counter == position - 1 {
+                    if let Some(ref mut next) = current.next {
+                        (*current).next = (*next).next.take();
+                    }
+                    return head;
+                }
+                cur = current;
+                counter += 1;
+            }
+
+            return head;
         }
         None => None,
     }

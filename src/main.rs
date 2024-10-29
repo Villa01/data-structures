@@ -18,4 +18,7 @@ fn main() {
     
     head = linked_list::delete_last(Some(head)).unwrap();
     linked_list::print_summary(&head);
+
+    head = linked_list::delete_at_position(Some(head), 2).unwrap();
+    linked_list::print_summary(&head);
 }
