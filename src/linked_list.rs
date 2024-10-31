@@ -83,8 +83,7 @@ pub fn insert_at_position(mut head: Option<Box<ListNode>>, data: i32, pos: usize
     let mut counter = 0;
 
     while let Some(ref mut node) = *cur {
-        // TODO: Check issue when inserting
-        if counter == pos {
+        if counter == pos - 1 {
             let mut new_node = ListNode::new(data);
             new_node.next = node.next.take();
             node.next = Some(Box::new(new_node));
@@ -253,11 +252,23 @@ mod tests {
         assert_eq!((*head).data, 1);
         assert!((*head).next.is_none());
 
-        head = insert_at_position(Some(head), 4, 2);
-        head = insert_at_position(Some(head), 0, 0);
-        print_summary(&head);
-        assert_eq!(length(&head), 3);
-        assert!((*head).next.is_some());
+        head = insert_at_position(Some(head), 4, 0);
+        head = insert_at_position(Some(head), 2, 0);
+        let position = 1;
+        let value = 69;
+        head = insert_at_position(Some(head), 69, 1);
+
+        let mut counter = 0;
+        let mut cur = &head;
+
+        while counter < position {
+            if let Some(ref node) = cur.next {
+                cur = &node;
+                counter += 1;
+            }
+        }
+        assert_eq!(length(&head), 4);
+        assert_eq!((*cur).data, value);
     }
 
     #[test]
