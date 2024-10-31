@@ -5,8 +5,10 @@ fn main() {
     let node1 = linked_list::insert_at_beginning(Some(node2), 2);
     let mut head = linked_list::insert_at_beginning(Some(node1), 1);
 
+    linked_list::print_summary(&head);
     head = linked_list::insert_at_end(Some(head), 5);
     head = linked_list::insert_at_end(Some(head), 6);
+    linked_list::print_summary(&head);
 
     head = linked_list::insert_at_position(Some(head), 4, 2);
     head = linked_list::insert_at_position(Some(head), 0, 0);

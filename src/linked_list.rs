@@ -1,4 +1,3 @@
-
 pub struct ListNode {
     pub data: i32,
     pub next: Option<Box<ListNode>>,
@@ -12,7 +11,7 @@ impl ListNode {
         }
     }
 
-    pub fn _to_string_debug(&self) -> String {
+    fn _to_string_debug(&self) -> String {
         format!("[{:p} {}]", self, self.data)
     }
 
@@ -84,6 +83,7 @@ pub fn insert_at_position(mut head: Option<Box<ListNode>>, data: i32, pos: usize
     let mut counter = 0;
 
     while let Some(ref mut node) = *cur {
+        // TODO: Check issue when inserting
         if counter == pos {
             let mut new_node = ListNode::new(data);
             new_node.next = node.next.take();
@@ -168,5 +168,101 @@ pub fn delete_at_position(
             return head;
         }
         None => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_linked_list_to_string() {
+        let head = insert_at_beginning(None, 1);
+        let string = head.to_string();
+        assert!(!string.is_empty());
+        assert_eq!(string, "[1]");
+        assert_ne!(string, "[2]");
+    }
+
+    #[test]
+    fn test_print() {
+        let head = insert_at_beginning(None, 1);
+        print(&head);
+        print_summary(&head);
+    }
+
+    #[test]
+    fn test_length() {
+        let mut head = insert_at_beginning(None, 1);
+        head = insert_at_beginning(Some(head), 1);
+        head = insert_at_beginning(Some(head), 1);
+
+        assert_eq!(length(&head), 3);
+    }
+
+    #[test]
+    fn test_linked_list_to_string_debug() {
+        let head = insert_at_beginning(None, 1);
+        let string = head._to_string_debug();
+        assert!(!string.is_empty());
+        assert_ne!(string, "[2]");
+    }
+
+    #[test]
+    fn test_insert_at_beggining() {
+        let head = insert_at_beginning(None, 1);
+        assert_eq!((*head).data, 1);
+        assert!((*head).next.is_none());
+    }
+
+    #[test]
+    fn test_insert_at_incorrect() {
+        let head = insert_at_beginning(None, 1);
+        assert_ne!((*head).data, 10);
+        assert!(!(*head).next.is_some());
+    }
+
+    #[test]
+    fn test_insert_at_beggining_existing_list() {
+        let mut head = insert_at_beginning(None, 2);
+        head = insert_at_beginning(Some(head), 1);
+        // Data is correct
+        assert_eq!((*head).data, 1);
+        // Next node exists
+        assert!((*head).next.is_some());
+        // Next node's data is correct
+        let next_node = head.next.unwrap();
+        assert_eq!(next_node.data, 2);
+        // Next node points to None
+        assert!(next_node.next.is_none());
+    }
+
+    #[test]
+    fn test_insert_at_end() {
+        let mut head = insert_at_end(None, 1);
+        assert_eq!((*head).data, 1);
+        assert!((*head).next.is_none());
+        head = insert_at_end(Some(head), 3);
+        head = insert_at_end(Some(head), 2);
+        assert_eq!((*head).data, 1);
+        assert!((*head).next.is_some());
+    }
+
+    #[test]
+    fn test_insert_at_position() {
+        let mut head = insert_at_position(None, 1, 0);
+        assert_eq!((*head).data, 1);
+        assert!((*head).next.is_none());
+
+        head = insert_at_position(Some(head), 4, 2);
+        head = insert_at_position(Some(head), 0, 0);
+        print_summary(&head);
+        assert_eq!(length(&head), 3);
+        assert!((*head).next.is_some());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_insert_at_wrong_position() {
+        insert_at_position(None, 1, 10);
     }
 }
