@@ -281,4 +281,56 @@ mod tests {
     fn test_insert_at_wrong_position() {
         insert_at_position(None, 1, 10);
     }
+
+    #[test]
+    fn test_delete_first() {
+        let none = delete_first(None);
+
+        assert!(none.is_none());
+
+        let mut head = insert_at_beginning(None, 4);
+        // Retuns None if there is no more nodes
+        head = insert_at_beginning(Some(head), 3);
+        head = insert_at_beginning(Some(head), 2);
+        head = insert_at_beginning(Some(head), 1);
+
+        let new_head = delete_first(Some(head));
+
+        assert!(new_head.is_some());
+
+        match new_head {
+            Some(node) => {
+                assert_eq!(2, node.data)
+            }
+            None => panic!("The new head should exist"),
+        }
+    }
+
+    #[test]
+    fn test_delete_last() {
+        let none = delete_last(None);
+
+        assert!(none.is_none());
+
+        let mut list_length = 100;
+
+        let mut head = insert_at_beginning(None, 69);
+
+        for i in 1..list_length {
+            head = insert_at_beginning(Some(head), i);
+        }
+        print_summary(&head);
+
+        head = delete_last(Some(head)).unwrap();
+        list_length -= 1;
+
+        let mut cur = &head;
+
+        while let Some(ref node) = (*cur).next {
+            cur = node;
+        }
+
+        assert_eq!(list_length, length(&head));
+        assert_eq!(1, (*cur).data);
+    }
 }
