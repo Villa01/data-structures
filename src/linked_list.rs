@@ -252,11 +252,15 @@ mod tests {
         assert_eq!((*head).data, 1);
         assert!((*head).next.is_none());
 
-        head = insert_at_position(Some(head), 4, 0);
-        head = insert_at_position(Some(head), 2, 0);
-        let position = 1;
+        let list_length = 29;
+
+        for i in 0..list_length - 2 {
+            head = insert_at_position(Some(head), i, 0);
+        }
+
+        let position = 15;
         let value = 69;
-        head = insert_at_position(Some(head), 69, 1);
+        head = insert_at_position(Some(head), 69, position);
 
         let mut counter = 0;
         let mut cur = &head;
@@ -267,7 +271,8 @@ mod tests {
                 counter += 1;
             }
         }
-        assert_eq!(length(&head), 4);
+        print_summary(&head);
+        assert_eq!(length(&head), list_length);
         assert_eq!((*cur).data, value);
     }
 
