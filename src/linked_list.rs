@@ -160,6 +160,9 @@ pub fn delete_at_position(
                     }
                     return head;
                 }
+                if counter >= position -1 {
+                    break;
+                }
                 cur = current;
                 counter += 1;
             }
@@ -332,5 +335,83 @@ mod tests {
 
         assert_eq!(list_length, length(&head));
         assert_eq!(1, (*cur).data);
+    }
+
+    #[test]
+    fn test_delete_last_single_node() {
+        let mut head = Some(insert_at_beginning(None, 69));
+
+        head = delete_last(head);
+
+        assert!(head.is_none());
+    }
+
+    #[test]
+    fn test_delete_at_position() {
+        let list_length = 5;
+        let mut head = insert_at_beginning(None, list_length);
+
+        for i in 1..list_length {
+            head = insert_at_beginning(Some(head), list_length - i);
+        }
+
+        let delete_position = 2;
+        let mut counter = 0;
+
+        let original_data: i32;
+
+        {
+            let mut original_cur = &head;
+            while counter < delete_position {
+                if let Some(ref node) = original_cur.next {
+                    original_cur = &node;
+                    counter += 1;
+                }
+            }
+            original_data = (*original_cur).data;
+        }
+
+        head = delete_at_position(Some(head), delete_position).unwrap();
+
+        let mut counter = 0;
+        let mut cur = &head;
+
+        while counter < delete_position {
+            if let Some(ref node) = cur.next {
+                cur = &node;
+                counter += 1;
+            }
+        }
+        assert_ne!(original_data, (*cur).data);
+    }
+
+    #[test]
+    fn delete_at_position_fist_item() {
+        let mut head = insert_at_beginning(None, 1);
+        head = insert_at_beginning(Some(head), 0);
+
+        head = delete_at_position(Some(head), 0).unwrap();
+
+        assert_eq!(1, head.data);
+    }
+
+    #[test]
+    fn delete_at_position_out_of_bounds() {
+        let list_length = 5;
+        let mut head = insert_at_beginning(None, list_length);
+
+        for i in 1..list_length {
+            head = insert_at_beginning(Some(head), list_length - i);
+        }
+
+        head = delete_at_position(Some(head), (list_length+1000) as usize).unwrap();
+
+        // Should have not deleted something
+        assert_eq!(length(&head), list_length);
+    }
+
+    #[test]
+    fn delete_at_position_none_head() {
+        assert!(delete_at_position(None, 100).is_none())
     }
 }
