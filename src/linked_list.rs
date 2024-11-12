@@ -1,10 +1,12 @@
-pub struct ListNode {
-    pub data: i32,
-    pub next: Option<Box<ListNode>>,
+use std::fmt::{Display};
+
+pub struct ListNode<T: Display> {
+    pub data: T,
+    pub next: Option<Box<ListNode<T>>>,
 }
 
-impl ListNode {
-    pub fn new(value: i32) -> ListNode {
+impl<T: Display> ListNode<T> {
+    pub fn new(value: T) -> ListNode<T> {
         ListNode {
             data: value,
             next: None,
@@ -12,15 +14,15 @@ impl ListNode {
     }
 
     fn _to_string_debug(&self) -> String {
-        format!("[{:p} {}]", self, self.data)
+        format!("[{:p}]", self)
     }
 
-    pub fn to_string(&self) -> String {
+    fn to_string(&self) -> String {
         format!("[{}]", self.data)
     }
 }
 
-pub fn print(head: &ListNode) {
+pub fn print<T: Display>(head: &ListNode<T>) {
     let mut cur = Some(head);
 
     while let Some(node) = cur {
@@ -30,12 +32,12 @@ pub fn print(head: &ListNode) {
     println!("None");
 }
 
-pub fn print_summary(head: &ListNode) {
+pub fn print_summary<T: Display>(head: &ListNode<T>) {
     print(&head);
     println!("Linked list length {len}", len = length(&head));
 }
 
-pub fn length(head: &ListNode) -> i32 {
+pub fn length<T: Display>(head: &ListNode<T>) -> i32 {
     let mut cur = Some(head);
     let mut count = 0;
     while let Some(node) = cur {
@@ -46,7 +48,10 @@ pub fn length(head: &ListNode) -> i32 {
 }
 
 // Receives an option because the List could be empty
-pub fn insert_at_beginning(head: Option<Box<ListNode>>, data: i32) -> Box<ListNode> {
+pub fn insert_at_beginning<T: Display>(
+    head: Option<Box<ListNode<T>>>,
+    data: T,
+) -> Box<ListNode<T>> {
     let mut new_node = Box::new(ListNode::new(data));
 
     match head {
@@ -58,7 +63,7 @@ pub fn insert_at_beginning(head: Option<Box<ListNode>>, data: i32) -> Box<ListNo
     }
 }
 
-pub fn insert_at_end(mut head: Option<Box<ListNode>>, data: i32) -> Box<ListNode> {
+pub fn insert_at_end<T: Display>(mut head: Option<Box<ListNode<T>>>, data: T) -> Box<ListNode<T>> {
     let new_node = Box::new(ListNode::new(data));
 
     match head {
@@ -74,7 +79,11 @@ pub fn insert_at_end(mut head: Option<Box<ListNode>>, data: i32) -> Box<ListNode
     }
 }
 
-pub fn insert_at_position(mut head: Option<Box<ListNode>>, data: i32, pos: usize) -> Box<ListNode> {
+pub fn insert_at_position<T: Display>(
+    mut head: Option<Box<ListNode<T>>>,
+    data: T,
+    pos: usize,
+) -> Box<ListNode<T>> {
     if pos == 0 {
         return insert_at_beginning(head, data);
     }
@@ -99,14 +108,14 @@ pub fn insert_at_position(mut head: Option<Box<ListNode>>, data: i32, pos: usize
 }
 
 // Returns the new head
-pub fn delete_first(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+pub fn delete_first<T: Display>(head: Option<Box<ListNode<T>>>) -> Option<Box<ListNode<T>>> {
     match head {
         Some(first_node) => return first_node.next,
         None => None,
     }
 }
 
-pub fn delete_last(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+pub fn delete_last<T: Display>(mut head: Option<Box<ListNode<T>>>) -> Option<Box<ListNode<T>>> {
     match head {
         Some(ref mut node) => {
             let mut cur = node;
@@ -133,10 +142,10 @@ pub fn delete_last(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
     }
 }
 
-pub fn delete_at_position(
-    mut head: Option<Box<ListNode>>,
+pub fn delete_at_position<T: Display>(
+    mut head: Option<Box<ListNode<T>>>,
     position: usize,
-) -> Option<Box<ListNode>> {
+) -> Option<Box<ListNode<T>>> {
     if position == 0 {
         return delete_first(head);
     }
@@ -160,7 +169,7 @@ pub fn delete_at_position(
                     }
                     return head;
                 }
-                if counter >= position -1 {
+                if counter >= position - 1 {
                     break;
                 }
                 cur = current;
@@ -178,7 +187,8 @@ mod tests {
     use super::*;
     #[test]
     fn test_linked_list_to_string() {
-        let head = insert_at_beginning(None, 1);
+        println!("Test");
+        let head = insert_at_beginning::<i32>(None, 1);
         let string = head.to_string();
         assert!(!string.is_empty());
         assert_eq!(string, "[1]");
@@ -187,14 +197,14 @@ mod tests {
 
     #[test]
     fn test_print() {
-        let head = insert_at_beginning(None, 1);
+        let head = insert_at_beginning::<i32>(None, 1);
         print(&head);
         print_summary(&head);
     }
 
     #[test]
     fn test_length() {
-        let mut head = insert_at_beginning(None, 1);
+        let mut head = insert_at_beginning::<i32>(None, 1);
         head = insert_at_beginning(Some(head), 1);
         head = insert_at_beginning(Some(head), 1);
 
@@ -203,7 +213,7 @@ mod tests {
 
     #[test]
     fn test_linked_list_to_string_debug() {
-        let head = insert_at_beginning(None, 1);
+        let head = insert_at_beginning::<i32>(None, 1);
         let string = head._to_string_debug();
         assert!(!string.is_empty());
         assert_ne!(string, "[2]");
@@ -211,21 +221,21 @@ mod tests {
 
     #[test]
     fn test_insert_at_beggining() {
-        let head = insert_at_beginning(None, 1);
+        let head = insert_at_beginning::<i32>(None, 1);
         assert_eq!((*head).data, 1);
         assert!((*head).next.is_none());
     }
 
     #[test]
     fn test_insert_at_incorrect() {
-        let head = insert_at_beginning(None, 1);
+        let head = insert_at_beginning::<i32>(None, 1);
         assert_ne!((*head).data, 10);
         assert!(!(*head).next.is_some());
     }
 
     #[test]
     fn test_insert_at_beggining_existing_list() {
-        let mut head = insert_at_beginning(None, 2);
+        let mut head = insert_at_beginning::<i32>(None, 2);
         head = insert_at_beginning(Some(head), 1);
         // Data is correct
         assert_eq!((*head).data, 1);
@@ -240,7 +250,7 @@ mod tests {
 
     #[test]
     fn test_insert_at_end() {
-        let mut head = insert_at_end(None, 1);
+        let mut head = insert_at_end::<i32>(None, 1);
         assert_eq!((*head).data, 1);
         assert!((*head).next.is_none());
         head = insert_at_end(Some(head), 3);
@@ -251,7 +261,7 @@ mod tests {
 
     #[test]
     fn test_insert_at_position() {
-        let mut head = insert_at_position(None, 1, 0);
+        let mut head = insert_at_position::<i32>(None, 1, 0);
         assert_eq!((*head).data, 1);
         assert!((*head).next.is_none());
 
@@ -282,22 +292,22 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_insert_at_wrong_position() {
-        insert_at_position(None, 1, 10);
+        insert_at_position::<i32>(None, 1, 10);
     }
 
     #[test]
     fn test_delete_first() {
-        let none = delete_first(None);
+        let none = delete_first::<i32>(None);
 
         assert!(none.is_none());
 
-        let mut head = insert_at_beginning(None, 4);
+        let mut head = insert_at_beginning::<i32>(None, 4);
         // Retuns None if there is no more nodes
         head = insert_at_beginning(Some(head), 3);
         head = insert_at_beginning(Some(head), 2);
         head = insert_at_beginning(Some(head), 1);
 
-        let new_head = delete_first(Some(head));
+        let new_head = delete_first::<i32>(Some(head));
 
         assert!(new_head.is_some());
 
@@ -311,13 +321,13 @@ mod tests {
 
     #[test]
     fn test_delete_last() {
-        let none = delete_last(None);
+        let none = delete_last::<i32>(None);
 
         assert!(none.is_none());
 
         let mut list_length = 100;
 
-        let mut head = insert_at_beginning(None, 69);
+        let mut head = insert_at_beginning::<i32>(None, 69);
 
         for i in 1..list_length {
             head = insert_at_beginning(Some(head), i);
@@ -339,7 +349,7 @@ mod tests {
 
     #[test]
     fn test_delete_last_single_node() {
-        let mut head = Some(insert_at_beginning(None, 69));
+        let mut head = Some(insert_at_beginning::<i32>(None, 69));
 
         head = delete_last(head);
 
@@ -398,13 +408,13 @@ mod tests {
     #[test]
     fn delete_at_position_out_of_bounds() {
         let list_length = 5;
-        let mut head = insert_at_beginning(None, list_length);
+        let mut head = insert_at_beginning::<i32>(None, list_length);
 
         for i in 1..list_length {
             head = insert_at_beginning(Some(head), list_length - i);
         }
 
-        head = delete_at_position(Some(head), (list_length+1000) as usize).unwrap();
+        head = delete_at_position(Some(head), (list_length + 1000) as usize).unwrap();
 
         // Should have not deleted something
         assert_eq!(length(&head), list_length);
@@ -412,6 +422,6 @@ mod tests {
 
     #[test]
     fn delete_at_position_none_head() {
-        assert!(delete_at_position(None, 100).is_none())
+        assert!(delete_at_position::<i32>(None, 100).is_none())
     }
 }
