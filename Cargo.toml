@@ -3,4 +3,8 @@ name = "data-structures"
 version = "0.1.0"
 edition = "2021"
 
+description = "Personal crate of me trying to implement data structures and algorithms in Rust."
+license = "MIT OR Apache-2.0"
+
 [dependencies]
+
