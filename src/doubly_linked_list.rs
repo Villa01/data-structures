@@ -188,6 +188,25 @@ mod tests {
             assert!(!list.is_empty())
         }
 
+        #[test]
+        fn test_len() {
+            let list_length: usize = 100;
+            let mut list: DoublyLinkedList<usize> = DoublyLinkedList::new();
+
+            for i in 1..list_length + 1 {
+                list.insert_at_beginning(i);
+            }
+            assert_eq!(list.len(), list_length);
+        }
+
+        #[test]
+        fn test_is_empty() {
+            let mut list: DoublyLinkedList<usize> = DoublyLinkedList::new();
+            assert!(list.is_empty());
+            list.insert_at_beginning(1);
+            assert!(!list.is_empty());
+        }
+
         mod insert_at_beginning {
             use super::*;
 
@@ -204,6 +223,20 @@ mod tests {
                 let mut list: DoublyLinkedList<i32> = DoublyLinkedList::with_value(2);
                 list.insert_at_beginning(1);
                 assert_eq!(list.len(), 2);
+            }
+
+            #[test]
+            fn test_with_several_nodes() {
+                struct T {}
+                let mut list: DoublyLinkedList<T> = DoublyLinkedList::new();
+
+                let list_length: usize = 100;
+
+                for _ in 1..list_length + 1 {
+                    list.insert_at_beginning(T {});
+                }
+
+                assert_eq!(list.len(), list_length);
             }
         }
     }
