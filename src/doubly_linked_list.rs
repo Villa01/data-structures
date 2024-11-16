@@ -1,3 +1,5 @@
+use core::fmt;
+
 /// A doubly-linked list implementation that allows efficient insertion and removal of elements.
 ///
 /// The `DoublyLinkedList` provides methods to insert, remove, and check elements at both ends of the list.
@@ -16,13 +18,13 @@
 /// ```
 ///
 /// # Type Parameters
-///
 /// - `T`: The type of elements stored in the list.
 ///
 /// # Fields
 ///
 /// - `head`: A pointer to the first node in the list. This is `None` when the list is empty.
 /// - `length`: The current number of elements in the list.
+
 pub struct DoublyLinkedList<T> {
     head: Option<*mut ListNode<T>>,
     tail: Option<*mut ListNode<T>>,
@@ -94,7 +96,6 @@ impl<T> DoublyLinkedList<T> {
     /// # Examples
     /// ```
     /// use villa01_data_structures::doubly_linked_list::DoublyLinkedList;
-    ///
     /// let list: DoublyLinkedList<i32> = DoublyLinkedList::with_value(69);
     /// assert_eq!(list.len(),1);
     /// ```
@@ -116,23 +117,74 @@ impl<T> DoublyLinkedList<T> {
     /// assert_eq!(list.len(), 1);
     /// ```
     pub fn insert_at_beginning(&mut self, data: T) {
-        let mut new_node = ListNode::new(data);
+        let new_node = Box::into_raw(Box::new(ListNode::new(data)));
         match self.head {
-            Some(current_head) => {
-                new_node.next = Some(current_head);
+            Some(head) => {
                 unsafe {
-                    (*current_head).prev = Some(&mut new_node);
+                    (*new_node).next = Some(head);
+                    (*head).prev = Some(new_node);
                 }
-                self.head = Some(&mut new_node);
+                self.head = Some(new_node);
             }
             None => {
                 // The list is empty and should be initialized
 
-                self.head = Some(&mut new_node);
-                self.tail = Some(&mut new_node);
+                self.head = Some(new_node);
+                self.tail = Some(new_node);
             }
         }
         self.length += 1;
+    }
+
+    /// Inserts an item of type `T` at the end of the `DoublyLinkedList`
+    ///
+    /// # Parameters
+    /// - `data`: The new value to be inserted.
+    ///
+    /// # Examples
+    /// ```
+    /// use villa01_data_structures::doubly_linked_list::DoublyLinkedList;
+    ///
+    /// let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+    /// list.insert_at_end(1);
+    /// assert_eq!(list.len(), 1);
+    /// ```
+    pub fn insert_at_end(&mut self, data: T) {
+        let new_node = Box::into_raw(Box::new(ListNode::new(data)));
+        match self.tail {
+            Some(tail) => {
+                unsafe {
+                    (*tail).next = Some(new_node);
+                    (*new_node).prev = Some(tail);
+                }
+                self.tail = Some(new_node);
+            }
+            None => {
+                // The list is empty and should be initialized
+
+                self.head = Some(new_node);
+                self.tail = Some(new_node);
+            }
+        }
+        self.length += 1;
+    }
+}
+
+impl<T: fmt::Display> fmt::Display for DoublyLinkedList<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut cursor = self.head;
+        write!(f, "START -> ")?;
+        unsafe {
+            while let Some(current) = cursor {
+                if cursor != self.head {
+                    write!(f, " <=>")?;
+                }
+                write!(f, " {} ", *current)?;
+                cursor = (*current).next
+            }
+        }
+        write!(f, "-> NULL")?;
+        Ok({})
     }
 }
 
@@ -170,6 +222,17 @@ impl<T> ListNode<T> {
     }
 }
 
+impl<T: fmt::Display> fmt::Display for ListNode<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut result = String::new();
+        result.push_str("[ ");
+        result.push_str(&(self.data.to_string()));
+        result.push_str(" ]");
+
+        return write!(f, "{}", result);
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -197,6 +260,26 @@ mod tests {
                 list.insert_at_beginning(i);
             }
             assert_eq!(list.len(), list_length);
+        }
+
+        #[test]
+        fn test_displaying_list() {
+            let mut list: DoublyLinkedList<usize> = DoublyLinkedList::new();
+            let list_length = 3;
+            for i in 1..list_length + 1 {
+                list.insert_at_beginning(i);
+            }
+            assert_eq!(list.len(), list_length);
+            let str_list = list.to_string();
+            assert_eq!(str_list, "START ->  [ 3 ]  <=> [ 2 ]  <=> [ 1 ] -> NULL");
+
+            let mut list: DoublyLinkedList<usize> = DoublyLinkedList::new();
+            for i in 1..list_length + 1 {
+                list.insert_at_end(i);
+            }
+            println!("{}", list);
+            let str_list = list.to_string();
+            assert_eq!(str_list, "START ->  [ 1 ]  <=> [ 2 ]  <=> [ 3 ] -> NULL")
         }
 
         #[test]
@@ -234,6 +317,39 @@ mod tests {
 
                 for _ in 1..list_length + 1 {
                     list.insert_at_beginning(T {});
+                }
+
+                assert_eq!(list.len(), list_length);
+            }
+        }
+
+        mod insert_at_end {
+            use super::*;
+
+            #[test]
+            fn test_empty_list() {
+                let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+                list.insert_at_end(1);
+                assert!(!list.is_empty());
+                assert_eq!(list.len(), 1);
+            }
+
+            #[test]
+            fn test_existing_head() {
+                let mut list: DoublyLinkedList<i32> = DoublyLinkedList::with_value(2);
+                list.insert_at_end(1);
+                assert_eq!(list.len(), 2);
+            }
+
+            #[test]
+            fn test_with_several_nodes() {
+                struct T {}
+                let mut list: DoublyLinkedList<T> = DoublyLinkedList::new();
+
+                let list_length: usize = 100;
+
+                for _ in 1..list_length + 1 {
+                    list.insert_at_end(T {});
                 }
 
                 assert_eq!(list.len(), list_length);
