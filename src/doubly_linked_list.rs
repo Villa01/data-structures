@@ -168,10 +168,111 @@ impl<T> DoublyLinkedList<T> {
         }
         self.length += 1;
     }
+
+    /// Inserts an item of type `T` at the given position of the `DoublyLinkedList`
+    ///
+    /// # Parameters
+    /// - `data`: The new value to be inserted.
+    /// - `pos`: Zero based position where the new node will be inserted.
+    ///
+    /// # Examples
+    /// ```
+    /// use villa01_data_structures::doubly_linked_list::DoublyLinkedList;
+    ///
+    /// let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+    /// list.insert_at_position(1, 0);
+    /// assert_eq!(list.len(), 1);
+    /// ```
+    pub fn insert_at_position(&mut self, data: T, pos: usize) -> Result<(), &str> {
+        if pos > self.len() {
+            return Err("Index out of bounds");
+        }
+
+        // Insert at beginning and insert at end are more efficient
+        if pos == 0 {
+            self.insert_at_beginning(data);
+            return Ok({});
+        }
+
+        if pos == self.len() {
+            self.insert_at_end(data);
+            return Ok({});
+        }
+
+        if pos < (self.len() / 2) {
+            println!("Inserting from start");
+            self.insert_at_position_from_start(data, pos);
+            return Ok({});
+        } else {
+            println!("Inserting from end");
+            self.insert_at_position_from_end(data, pos);
+            return Ok({});
+        }
+    }
+
+    fn insert_at_position_from_start(&mut self, data: T, pos: usize) {
+        let new_node = Box::into_raw(Box::new(ListNode::new(data)));
+
+        let mut cursor = self.head;
+        let mut counter = 0;
+
+        unsafe {
+            while let Some(node) = cursor {
+                if counter == pos {
+                    // Link the new node with the previous node
+                    if let Some(n) = (*node).prev {
+                        (*n).next = Some(new_node);
+                        (*new_node).prev = Some(n);
+                    }
+                    // Link the new node with the next node
+                    (*new_node).next = Some(node);
+                    (*node).prev = Some(new_node);
+
+                    self.length += 1;
+                    return;
+                }
+
+                cursor = (*node).next;
+                counter += 1;
+            }
+        }
+    }
+
+    fn insert_at_position_from_end(&mut self, data: T, pos: usize) {
+        let new_node = Box::into_raw(Box::new(ListNode::new(data)));
+
+        let mut cursor = self.tail;
+        let mut counter = self.len() - 1;
+
+        unsafe {
+            while let Some(node) = cursor {
+                if counter == pos {
+                    // Link the new node with the previous node
+                    if let Some(n) = (*node).prev {
+                        (*n).next = Some(new_node);
+                        (*new_node).prev = Some(n);
+                    }
+                    // Link the new node with the next node
+                    (*new_node).next = Some(node);
+                    (*node).prev = Some(new_node);
+
+                    self.length += 1;
+                    return;
+                }
+
+                cursor = (*node).prev;
+                counter -= 1;
+            }
+        }
+    }
 }
 
 impl<T: fmt::Display> fmt::Display for DoublyLinkedList<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.len() == 0 {
+            write!(f, "EMPTY")?;
+            return Ok({});
+        }
         let mut cursor = self.head;
         write!(f, "START -> ")?;
         unsafe {
@@ -278,6 +379,7 @@ mod tests {
         #[test]
         fn test_displaying_list() {
             let mut list: DoublyLinkedList<usize> = DoublyLinkedList::new();
+            assert_eq!(list.to_string(), "EMPTY");
             let list_length = 3;
             for i in 1..list_length + 1 {
                 list.insert_at_beginning(i);
@@ -366,6 +468,62 @@ mod tests {
                 }
 
                 assert_eq!(list.len(), list_length);
+            }
+        }
+
+        mod insert_at_position {
+            use super::*;
+
+            #[test]
+            fn test_at_zero() {
+                let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+                let _ = list.insert_at_position(1, 0);
+                assert!(!list.is_empty());
+                assert_eq!(list.len(), 1);
+            }
+
+            #[test]
+            #[should_panic]
+            fn test_at_non_zero_out_of_bounds() {
+                let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+                let _ = list.insert_at_position(1, 20).unwrap();
+            }
+
+            #[test]
+            fn test_existing_head() {
+                let mut list: DoublyLinkedList<i32> = DoublyLinkedList::with_value(2);
+                list.insert_at_position(1, 1).unwrap();
+                assert_eq!(list.len(), 2);
+            }
+
+            #[test]
+            fn test_with_several_nodes_from_start() {
+                let mut list: DoublyLinkedList<usize> = DoublyLinkedList::new();
+
+                let list_length: usize = 10;
+
+                for i in 1..list_length + 1 {
+                    list.insert_at_position(i, 0).unwrap();
+                }
+
+                list.insert_at_position(69, 3).unwrap();
+
+                assert_eq!(list.len(), list_length + 1);
+            }
+
+            #[test]
+            fn test_with_several_nodes_from_end() {
+                let mut list: DoublyLinkedList<usize> = DoublyLinkedList::new();
+
+                let list_length: usize = 10;
+
+                for i in 1..list_length + 1 {
+                    list.insert_at_position(i, 0).unwrap();
+                }
+
+                list.insert_at_position(69, 7).unwrap();
+
+                assert_eq!(list.len(), list_length + 1);
             }
         }
     }
