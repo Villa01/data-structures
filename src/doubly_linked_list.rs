@@ -169,20 +169,47 @@ impl<T> DoublyLinkedList<T> {
         self.length += 1;
     }
 
-    /// Inserts an item of type `T` at the given position of the `DoublyLinkedList`
+    /// Inserts a new element at the specified position in the `DoublyLinkedList`.
     ///
     /// # Parameters
-    /// - `data`: The new value to be inserted.
-    /// - `pos`: Zero based position where the new node will be inserted.
+    ///
+    /// - `data`: The data of type `T` to be inserted into the list.
+    /// - `pos`: The zero-based index at which the new element should be inserted.
+    ///
+    /// # Returns
+    ///
+    /// - `Ok(())`: If the element is successfully inserted at the specified position.
+    /// - `Err(&str)`: If the position is out of bounds.
     ///
     /// # Examples
+    ///
     /// ```
     /// use villa01_data_structures::doubly_linked_list::DoublyLinkedList;
     ///
-    /// let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
-    /// list.insert_at_position(1, 0);
-    /// assert_eq!(list.len(), 1);
+    /// let mut list = DoublyLinkedList::new();
+    /// list.insert_at_position(42, 0).unwrap(); // Insert at the beginning
+    /// list.insert_at_position(84, 1).unwrap(); // Insert at the end
+    /// list.insert_at_position(63, 1).unwrap(); // Insert in the middle
+    ///
+    /// assert_eq!(list.get_first(), Some(&42));
+    ///
+    /// assert!(list.insert_at_position(99, 10).is_err()); // Out of bounds
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an error string `"Index out of bounds"` if `pos > self.len()`.
+    ///
+    /// # Notes
+    ///
+    /// - This method uses `insert_at_position_from_start` for positions in the first half of the list
+    ///   and `insert_at_position_from_end` for positions in the second half for efficiency.
+    /// - Ensure that `pos` is within valid bounds to avoid a panic.
+    ///
+    /// # Complexity
+    ///
+    /// - **Best Case (Insert at Beginning/End):** `O(1)`
+    /// - **Average Case (Insert at Position):** `O(n/2)`   
     pub fn insert_at_position(&mut self, data: T, pos: usize) -> Result<(), &str> {
         if pos > self.len() {
             return Err("Index out of bounds");
@@ -263,6 +290,66 @@ impl<T> DoublyLinkedList<T> {
                 cursor = (*node).prev;
                 counter -= 1;
             }
+        }
+    }
+
+    /// Retrieves a reference to the first element in the `DoublyLinkedList`, if it exists.
+    ///
+    /// # Returns
+    ///
+    /// - `Some(&T)`: A reference to the first element in the list.
+    /// - `None`: If the list is empty.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use villa01_data_structures::doubly_linked_list::DoublyLinkedList;
+    ///
+    /// let mut list = DoublyLinkedList::new();
+    /// assert_eq!(list.get_first(), None);
+    ///
+    /// list.insert_at_beginning(42);
+    /// list.insert_at_beginning(84);
+    ///
+    /// assert_eq!(list.get_first(), Some(&84));
+    /// ```
+    /// # Complexity
+    /// - `O(1)`
+    ///
+    pub fn get_first(&self) -> Option<&T> {
+        match self.head {
+            Some(head) => unsafe { return Some(&(*head).data) },
+            None => None,
+        }
+    }
+
+    /// Retrieves a reference to the first element in the `DoublyLinkedList`, if it exists.
+    ///
+    /// # Returns
+    ///
+    /// - `Some(&mut T)`: A mutable reference to the first element in the list.
+    /// - `None`: If the list is empty.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use villa01_data_structures::doubly_linked_list::DoublyLinkedList;
+    ///
+    /// let mut list = DoublyLinkedList::new();
+    /// assert_eq!(list.get_first(), None);
+    ///
+    /// list.insert_at_beginning(42);
+    /// list.insert_at_beginning(84);
+    ///
+    /// assert_eq!(list.get_first(), Some(&84));
+    /// ```
+    /// # Complexity
+    /// - `O(1)`
+    ///
+    pub fn get_first_mut(&self) -> Option<&mut T> {
+        match self.head {
+            Some(head) => unsafe { return Some(&mut (*head).data) },
+            None => None,
         }
     }
 }
@@ -524,6 +611,64 @@ mod tests {
                 list.insert_at_position(69, 7).unwrap();
 
                 assert_eq!(list.len(), list_length + 1);
+            }
+        }
+
+        mod get_first {
+            use super::*;
+
+            #[test]
+            fn test_get_first_empty_list() {
+                let list: DoublyLinkedList<usize> = DoublyLinkedList::new();
+                let i = list.get_first();
+
+                assert!(i.is_none());
+            }
+
+            #[test]
+            fn test_get_first() {
+                let value = 10;
+                let list: DoublyLinkedList<usize> = DoublyLinkedList::with_value(value);
+                let i = list.get_first();
+
+                assert!(i.is_some());
+                assert_eq!(value, *(i.unwrap()));
+            }
+            #[test]
+            fn test_get_first_verify_inmutable() {
+                let value = 10;
+                let list: DoublyLinkedList<usize> = DoublyLinkedList::with_value(value);
+                let i = list.get_first();
+
+                assert!(i.is_some());
+                assert_eq!(value, *(i.unwrap()));
+            }
+        }
+
+        mod get_first_mut {
+            use super::*;
+
+            #[test]
+            fn test_get_first_empty_list() {
+                let list: DoublyLinkedList<usize> = DoublyLinkedList::new();
+                let i = list.get_first_mut();
+
+                assert!(i.is_none());
+            }
+
+            #[test]
+            fn test_get_first() {
+                let value = 10;
+                let list: DoublyLinkedList<usize> = DoublyLinkedList::with_value(value);
+                let i = list.get_first_mut();
+                assert!(i.is_some());
+
+                let ivalue = i.unwrap();
+                assert_eq!(value, *(ivalue));
+                (*ivalue) += 1;
+
+                let new_value = list.get_first().unwrap();
+                assert_eq!(value + 1, *(new_value));
             }
         }
     }
