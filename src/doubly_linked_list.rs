@@ -448,7 +448,7 @@ impl<T> DoublyLinkedList<T> {
             return self.get_first();
         }
 
-        if pos == self.len() {
+        if pos == self.len() - 1 {
             return self.get_last();
         }
 
@@ -530,7 +530,7 @@ impl<T> DoublyLinkedList<T> {
             return self.get_first_mut();
         }
 
-        if pos == self.len() {
+        if pos == self.len() - 1 {
             return self.get_last_mut();
         }
 
@@ -555,7 +555,7 @@ impl<T> DoublyLinkedList<T> {
                 counter += 1;
             }
         }
-        return None;
+        unreachable!()
     }
 
     fn get_from_end_mut(&self, pos: usize) -> Option<&mut T> {
@@ -572,7 +572,7 @@ impl<T> DoublyLinkedList<T> {
                 counter -= 1;
             }
         }
-        return None;
+        unreachable!()
     }
 }
 
@@ -965,6 +965,16 @@ mod tests {
             }
 
             #[test]
+            fn test_at_len() {
+                let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+                let value = 69;
+                list.insert_at_end(10);
+                list.insert_at_end(value);
+                let first = list.get(1).unwrap();
+                assert_eq!(&value, first);
+            }
+
+            #[test]
             #[should_panic]
             fn test_at_non_zero_out_of_bounds() {
                 let list: DoublyLinkedList<i32> = DoublyLinkedList::new();
@@ -1019,6 +1029,16 @@ mod tests {
                 let mut value = 69;
                 let _ = list.insert_at_beginning(value);
                 let first = list.get_mut(0).unwrap();
+                assert_eq!(&mut value, first);
+            }
+
+            #[test]
+            fn test_at_len() {
+                let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+                let mut value = 69;
+                list.insert_at_end(10);
+                list.insert_at_end(value);
+                let first = list.get_mut(1).unwrap();
                 assert_eq!(&mut value, first);
             }
 
