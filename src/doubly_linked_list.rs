@@ -63,11 +63,11 @@ impl<T> DoublyLinkedList<T> {
     /// assert_eq!(list.len(), 1);
     /// ```
     pub fn with_value(data: T) -> DoublyLinkedList<T> {
-        let mut new_node = ListNode::new(data);
+        let new_node = Box::into_raw(Box::new(ListNode::new(data)));
 
         DoublyLinkedList {
-            head: Some(&mut new_node),
-            tail: Some(&mut new_node),
+            head: Some(new_node),
+            tail: Some(new_node),
             length: 1,
         }
     }
@@ -188,6 +188,19 @@ impl<T: fmt::Display> fmt::Display for DoublyLinkedList<T> {
     }
 }
 
+impl<T> Drop for DoublyLinkedList<T> {
+    fn drop(&mut self) {
+        let mut cursor = self.head;
+        while let Some(node) = cursor {
+            unsafe {
+                // Deallocating memory from heap to avoid memory leakage
+                let _ = Box::from_raw(node);
+                cursor = (*node).next;
+            }
+        }
+    }
+}
+
 /// A node in a doubly linked list.
 ///
 /// Each `ListNode` stores a piece of data of type `T` along with raw pointers to the
@@ -248,7 +261,7 @@ mod tests {
         #[test]
         fn test_with_value() {
             let list: DoublyLinkedList<bool> = DoublyLinkedList::with_value(true);
-            assert!(!list.is_empty())
+            assert!(!list.is_empty());
         }
 
         #[test]
