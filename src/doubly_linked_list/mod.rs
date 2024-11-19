@@ -52,6 +52,7 @@ struct ListNode<T> {
     data: T,
 }
 
+pub mod delete;
 pub mod delete_first;
 pub mod delete_last;
 pub mod display;
