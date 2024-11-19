@@ -1,6 +1,50 @@
 use super::DoublyLinkedList;
 
 impl<T: std::fmt::Display> DoublyLinkedList<T> {
+    /// Deletes the element at the specified position in the `DoublyLinkedList`.
+    ///
+    /// # Parameters
+    ///
+    /// - `pos`: The zero-based index of the element to be deleted.
+    ///
+    /// # Panics
+    ///
+    /// - Panics with `"index out of bounds"` if `pos >= self.len()`.
+    ///
+    /// # Behavior
+    ///
+    /// - If `pos == 0`, the method calls [`delete_first`](#method.delete_first).
+    /// - If `pos == self.len() - 1`, the method calls [`delete_last`](#method.delete_last).
+    /// - If `pos` is in the second half of the list (`pos >= self.len() / 2`), the method calls [`delete_from_end`](#method.delete_from_end).
+    /// - Otherwise, the method calls [`delete_from_start`](#method.delete_from_start).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use villa01_data_structures::doubly_linked_list::DoublyLinkedList;
+    ///
+    /// let mut list = DoublyLinkedList::new();
+    /// list.insert_at_end(10);
+    /// list.insert_at_end(20);
+    /// list.insert_at_end(30);
+    ///
+    /// list.delete(1); // Deletes the element at index 1
+    ///
+    /// assert_eq!(list.len(), 2);
+    /// assert_eq!(list.get(0), Some(&10));
+    /// assert_eq!(list.get(1), Some(&30));
+    /// ```
+    /// # Complexity
+    ///
+    /// - **Time Complexity:**
+    ///   - `O(1)` for deleting the first or last element (`pos == 0` or `pos == self.len() - 1`).
+    ///   - `O(min(pos, self.len() - pos))` for deleting an element at an arbitrary position:
+    ///     - If `pos < self.len() / 2`, the traversal starts from the head and takes `O(pos)` time.
+    ///     - If `pos >= self.len() / 2`, the traversal starts from the tail and takes `O(self.len() - pos)` time.
+    ///
+    /// - **Space Complexity:**
+    ///   - `O(1)` for all cases, as no additional memory is allocated beyond local variables.
+    ///
     pub fn delete(&mut self, pos: usize) {
         assert!(pos < self.len(), "index out of bounds");
 
