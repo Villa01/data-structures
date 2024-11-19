@@ -1,6 +1,6 @@
 [package]
 name = "villa01-data-structures"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 description = "Personal crate of me trying to implement data structures and algorithms in Rust."
